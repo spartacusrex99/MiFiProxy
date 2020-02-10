@@ -2,11 +2,13 @@ package org.minima.mifi;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.handshake.ClientHandshake;
+import org.java_websocket.handshake.ServerHandshakeBuilder;
 import org.java_websocket.server.WebSocketServer;
 
 public class MiFiWebSocketServer extends WebSocketServer {
@@ -25,6 +27,16 @@ public class MiFiWebSocketServer extends WebSocketServer {
 		mPort = port;
 		
 		System.out.println("MiFiWebSocketServer started on "+port);
+	}
+	
+	/**
+	 * Fix CORS errors when trying to connect from a different host
+	 */
+	@Override
+	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, Draft draft, ClientHandshake request) throws InvalidDataException {
+		ServerHandshakeBuilder builder = super.onWebsocketHandshakeReceivedAsServer( conn, draft, request );
+		builder.put( "Access-Control-Allow-Origin" , "*");
+		return builder;
 	}
 	
 	public int getPort() {
