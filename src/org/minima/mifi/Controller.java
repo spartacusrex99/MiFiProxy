@@ -6,7 +6,7 @@ import org.utils.messages.MessageProcessor;
 public class Controller extends MessageProcessor {
 
 	public Controller() {
-		// TODO Auto-generated constructor stub
+		super("CONTROLLER");
 	}
 	
 	@Override
