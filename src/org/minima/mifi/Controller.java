@@ -1,7 +1,5 @@
 package org.minima.mifi;
 
-import java.net.UnknownHostException;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,14 +12,35 @@ public class Controller extends MessageProcessor {
 	public static String CONTROLLER_START 	 = "CONTROLLER_START";
 	public static String CONTROLLER_SHUTDOWN = "CONTROLLER_SHUTDOWN";
 	
+	public static String CONTROLLER_NODEREQ = "CONTROLLER_NODEREQ";
+	
 	public static String CONTROLLER_MSG = "CONTROLLER_MSG";
 	
-	
+	/**
+	 * Web Pages connect to this one
+	 */
 	int mWebSocketPort = 8889;
 	MiFiWebSocketServer mWSServer;
 	
+	/**
+	 * Minima Nodes send GET requests to this
+	 */
+	int mNodeServerPort = 9000;
+	NodeServer mNodeServer;
+	
+	/**
+	 * Default Constructor
+	 */
 	public Controller() {
 		super("CONTROLLER");
+	}
+	
+	public MiFiWebSocketServer getWeebSocketSewrver() {
+		return mWSServer;
+	}
+	
+	public NodeServer getNodeServer() {
+		return mNodeServer;
 	}
 	
 	@Override
@@ -29,8 +48,8 @@ public class Controller extends MessageProcessor {
 		
 		if(zMessage.isMessageType(CONTROLLER_START)) {
 			
-			//Which port
-			if(zMessage.exists("port")) {
+			//Which web socket port
+			if(zMessage.exists("websockport")) {
 				mWebSocketPort = zMessage.getInteger("port");
 			}
 				
@@ -52,14 +71,45 @@ public class Controller extends MessageProcessor {
 			//Start the Web Socket Server
 			wsthread.start();
 			
+			
+			//Which web socket port
+			if(zMessage.exists("nodeserverport")) {
+				mNodeServerPort = zMessage.getInteger("nodeserverport");
+			}
+			
+			//Create the Node Server
+			mNodeServer = new NodeServer(mNodeServerPort, this);
+		
+			//Run it
+			Thread nodesthread = new Thread(mNodeServer);
+			nodesthread.start();
+			
 		}else if(zMessage.isMessageType(CONTROLLER_SHUTDOWN)) {
-			//Stop it..
+			//Stop this..
 			if(mWSServer != null) { 
 				mWSServer.stop(1000);
 			}
 			
-			//And stop this message processor
+			//Stop that..
+			if(mNodeServer != null) {
+				mNodeServer.stop();
+			}
+			
+			//And stop the message processor
 			stopMessageProcessor();
+		
+		}else if(zMessage.isMessageType(CONTROLLER_NODEREQ)) {
+			//Request sent from node telling a webpage where to look.
+			String req = zMessage.getString("request");
+			
+			//Split the request up..
+			int split = req.indexOf("#");
+			
+			String WebID = req.substring(0,split);
+			String IP    = req.substring(split+1);
+			
+			//Send to the correct Web Socket..
+			mWSServer.sendMessage(WebID, IP);
 			
 		}else if(zMessage.isMessageType(CONTROLLER_MSG)) {
 			
@@ -70,8 +120,11 @@ public class Controller extends MessageProcessor {
 				int count = 0;
 				ConcurrentHashMap<String, WebSocket> webids = mWSServer.getAllWebID();
 				
+				System.out.println("WS Connections found "+webids.size());
+				
 				//Get all the Keys..
 				Enumeration<String> ids = webids.keys();
+				
 				while(ids.hasMoreElements()) {
 					String id = ids.nextElement();
 					System.out.println(count+") "+id+" "+webids.get(id));

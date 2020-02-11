@@ -18,15 +18,10 @@ public class MiFiWebSocketServer extends WebSocketServer {
 	//Links a string to the Connection..
 	ConcurrentHashMap<String, WebSocket> mWebID = new ConcurrentHashMap<String, WebSocket>();
 
-//	//A link from the hashcode of the connection to tghe string id
-//	ConcurrentHashMap<Integer, String> mHashLink = new ConcurrentHashMap<Integer, String>();
-	
 	public MiFiWebSocketServer( int port ) throws UnknownHostException {
 		super( new InetSocketAddress( port ) );
 		
 		mPort = port;
-		
-		System.out.println("MiFiWebSocketServer started on "+port);
 	}
 	
 	/**
@@ -39,10 +34,6 @@ public class MiFiWebSocketServer extends WebSocketServer {
 		return builder;
 	}
 	
-	public int getPort() {
-		return mPort;
-	}
-	
 	public ConcurrentHashMap<String, WebSocket> getAllWebID() {
 		return mWebID;
 	}
@@ -51,9 +42,16 @@ public class MiFiWebSocketServer extends WebSocketServer {
 		return mWebID.get(zWebID);
 	}
 	
-	public void sendMessage(String zWebID, String zMessage) {
+	public boolean sendMessage(String zWebID, String zMessage) {
 		WebSocket conn = getConnection(zWebID);
-		conn.send(zMessage);
+		
+		if(conn != null) {
+			conn.send(zMessage);
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	@Override
@@ -85,8 +83,9 @@ public class MiFiWebSocketServer extends WebSocketServer {
 	
 	@Override
 	public void onStart() {
-		System.out.println("WS On Start..");
+		System.out.println("MiFiWebSocketServer started on "+mPort);
 		
+		//Disconnect after a certain amount of time
 //		setConnectionLostTimeout(0);
 //		setConnectionLostTimeout(100);
 	}

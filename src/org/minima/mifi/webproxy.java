@@ -59,7 +59,6 @@ public class webproxy {
 	    	System.out.println(ex.toString());
 	    }
 		
-	    System.out.println("Main thread stopped");
+	    System.out.println("MiFi Web Proxy stopped");
 	}
-	
 }
