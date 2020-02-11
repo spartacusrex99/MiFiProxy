@@ -105,7 +105,7 @@ public class Controller extends MessageProcessor {
 			//Split the request up..
 			int split = req.indexOf("#");
 			
-			String WebID = req.substring(0,split);
+			String WebID = req.substring(0,split); 
 			String IP    = req.substring(split+1);
 			
 			//Send to the correct Web Socket..
