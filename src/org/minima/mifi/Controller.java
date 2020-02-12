@@ -111,6 +111,8 @@ public class Controller extends MessageProcessor {
 			//Send to the correct Web Socket..
 			mWSServer.sendMessage(WebID, IP);
 			
+			//#TODO Really need a login system / public ley etc etc
+			
 		}else if(zMessage.isMessageType(CONTROLLER_MSG)) {
 			
 			String message = zMessage.getString("message");
