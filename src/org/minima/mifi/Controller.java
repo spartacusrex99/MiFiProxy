@@ -25,7 +25,7 @@ public class Controller extends MessageProcessor {
 	/**
 	 * Minima Nodes send GET requests to this
 	 */
-	int mNodeServerPort = 8890;
+	int mNodeServerPort = 9000;
 	NodeServer mNodeServer;
 	
 	/**
