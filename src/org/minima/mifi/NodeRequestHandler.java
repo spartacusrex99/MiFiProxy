@@ -73,17 +73,19 @@ public class NodeRequestHandler implements Runnable {
 				mController.PostMessage(msg);
 				
 				//A response message
-				String resp = "OK";
+				//String resp = "OK";
 				
 				// send HTTP Headers
-				out.println("HTTP/1.1 200 OK");
+				out.println("HTTP/1.1 204 OK");
 				out.println("Server: HTTP WebProxy Server from Minima : 1.0");
 				out.println("Date: " + new Date());
 				out.println("Content-type: text/plain");
-				out.println("Content-length: " + resp.length());
+				out.println("Content-length: 0");
 				out.println("Access-Control-Allow-Origin: *");
 				out.println(); // blank line between headers and content, very important !
-				out.println(resp);
+				
+				//out.println(resp);
+				
 				out.flush(); // flush character output stream buffer
 			}
 			
@@ -94,6 +96,7 @@ public class NodeRequestHandler implements Runnable {
 			try {
 				in.close();
 				out.close();
+				
 				mSocket.close(); // we close socket connection
 			} catch (Exception e) {
 				System.err.println("Error closing stream : " + e.getMessage());

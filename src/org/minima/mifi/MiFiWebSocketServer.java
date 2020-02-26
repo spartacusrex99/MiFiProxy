@@ -31,6 +31,9 @@ public class MiFiWebSocketServer extends WebSocketServer {
 	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, Draft draft, ClientHandshake request) throws InvalidDataException {
 		ServerHandshakeBuilder builder = super.onWebsocketHandshakeReceivedAsServer( conn, draft, request );
 		builder.put( "Access-Control-Allow-Origin" , "*");
+		
+		System.out.println("Access-Control-Allow-Origin  set..");
+		
 		return builder;
 	}
 	
